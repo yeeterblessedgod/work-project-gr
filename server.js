@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  *  СЕРВЕР YourProjectName — ВАРИАНТ GR (зелёная тема, другой каталог)
- *  Запуск: npm install  →  npm start  →  http://localhost:3001
+ *  Запуск: npm install  →  npm start  →  http://localhost:3001 (или следующий свободный)
  *
  *  РОЛИ (иерархия прав):
  *    guest   — только просмотр каталога
@@ -20,9 +20,11 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
+const net = require('net');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+/** Порт по умолчанию; если занят — сервер сам возьмёт 3002, 3003… */
+const DEFAULT_PORT = Number(process.env.PORT) || 3001;
 
 // --- Пути к JSON-файлам (хранилище данных; на экзамене можно заменить на MySQL) ---
 const DATA_DIR = path.join(__dirname, 'data');
@@ -366,10 +368,51 @@ app.put('/api/admin/orders/:id', requireRole('admin'), (req, res) => {
 });
 
 // ============================================================================
-//  ЗАПУСК
+//  ЗАПУСК (автовыбор порта, если DEFAULT_PORT занят)
 // ============================================================================
 
-app.listen(PORT, () => {
-  console.log(`YourProjectName [GR]: http://localhost:${PORT}`);
-  console.log('Тест: user/user123, manager/manager123, admin/admin123');
-});
+function findFreePort(startPort, maxAttempts = 50) {
+  return new Promise((resolve, reject) => {
+    let port = startPort;
+    let attempt = 0;
+
+    const probe = () => {
+      const tester = net.createServer();
+      tester.unref();
+      tester.on('error', (err) => {
+        tester.close();
+        if (err.code === 'EADDRINUSE' && attempt < maxAttempts) {
+          attempt += 1;
+          port += 1;
+          probe();
+        } else {
+          reject(err);
+        }
+      });
+      tester.listen(port, '127.0.0.1', () => {
+        tester.close(() => resolve(port));
+      });
+    };
+
+    probe();
+  });
+}
+
+function startServer() {
+  findFreePort(DEFAULT_PORT)
+    .then((port) => {
+      if (port !== DEFAULT_PORT) {
+        console.log(`Порт ${DEFAULT_PORT} занят — используем ${port}`);
+      }
+      app.listen(port, () => {
+        console.log(`YourProjectName [GR]: http://localhost:${port}`);
+        console.log('Тест: user/user123, manager/manager123, admin/admin123');
+      });
+    })
+    .catch((err) => {
+      console.error('Не удалось запустить сервер:', err.message);
+      process.exit(1);
+    });
+}
+
+startServer();
