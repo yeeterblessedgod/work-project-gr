@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <!-- ========================================================================
+       КАТАЛОГ [GR] — основная страница после входа
+       Роли и возможности:
+         guest   — только просмотр
+         user    — + корзина
+         manager — + CRUD товаров + базовая сортировка (имя, цена, дата)
+         admin   — + расширенная сортировка + кнопка в админ-панель
+       Логика: public/js/catalog.js
+       ======================================================================== -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Каталог — YourProjectName</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div>
+      <h1>YourProjectName — витрина игрушек</h1>
+      <span id="user-greeting"></span>
+      <span id="role-badge" class="role-badge"></span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <!-- Только для admin: переход в админ-панель -->
+      <a href="/admin.html" id="btn-admin-panel" class="btn btn-primary hidden">Войти в админ-панель</a>
+      <form action="/logout" method="POST" style="margin:0">
+        <button type="submit" class="btn btn-secondary">Выйти</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="role-hint" id="role-hint">
+      <strong>Подсказка по роли:</strong> <span id="role-hint-text"></span>
+    </div>
+
+    <!-- Панель сортировки: guest не видит; manager — базовая; admin — расширенная -->
+    <section class="toolbar" id="sort-toolbar">
+      <span id="sort-label">Сортировка:</span>
+      <select id="sort-by">
+        <option value="name">По имени</option>
+        <option value="price">По цене</option>
+        <option value="publishedAt">По дате публикации</option>
+        <!-- Расширенная сортировка только для admin (показывается в catalog.js) -->
+        <option value="category" class="sort-admin-only hidden">По категории</option>
+        <option value="stock" class="sort-admin-only hidden">По остатку</option>
+      </select>
+      <select id="sort-order">
+        <option value="asc">По возрастанию</option>
+        <option value="desc">По убыванию</option>
+      </select>
+      <button type="button" class="btn btn-secondary btn-sm" id="btn-refresh">Обновить</button>
+    </section>
+
+    <!-- Сетка карточек товаров -->
+    <div id="products-grid" class="products-grid"></div>
+
+    <!-- Блок корзины: только user (и выше, но оформление — user) -->
+    <section id="cart-section" class="cart-summary hidden">
+      <h2>Корзина</h2>
+      <ul id="cart-list"></ul>
+      <p><strong>Итого: <span id="cart-total">0</span> ₽</strong></p>
+      <button type="button" class="btn btn-primary" id="btn-checkout">Оформить заказ</button>
+    </section>
+
+    <!-- Управление товарами для manager/admin -->
+    <section id="manager-section" class="cart-summary hidden">
+      <h2>Управление товарами (менеджер / админ)</h2>
+      <p class="subtitle">Добавление и редактирование карточек в каталоге</p>
+      <form id="product-form">
+        <input type="hidden" id="product-id">
+        <div class="form-group">
+          <label>Название</label>
+          <input type="text" id="product-name" required>
+        </div>
+        <div class="form-group">
+          <label>Описание</label>
+          <textarea id="product-desc" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Цена</label>
+          <input type="number" id="product-price" min="0" required>
+        </div>
+        <div class="form-group">
+          <label>Категория</label>
+          <input type="text" id="product-category">
+        </div>
+        <div class="form-group">
+          <label>Остаток</label>
+          <input type="number" id="product-stock" min="0">
+        </div>
+        <div class="form-group">
+          <label>Дата публикации</label>
+          <input type="date" id="product-date">
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить товар</button>
+        <button type="button" class="btn btn-secondary" id="product-form-reset">Очистить</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">YourProjectName · вариант GR · учебный проект ДЭ</footer>
+
+  <script src="/js/catalog.js"></script>
+</body>
+</html>

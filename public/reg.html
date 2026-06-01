@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <!-- ========================================================================
+       СТРАНИЦА РЕГИСТРАЦИИ — YourProjectName
+       POST /register → новый пользователь с ролью user
+       ======================================================================== -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Регистрация — YourProjectName</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="auth-page">
+
+  <div class="auth-card">
+    <span class="auth-variant-tag">Вариант GR</span>
+    <h1>Регистрация</h1>
+    <p class="subtitle">Создайте аккаунт YourProjectName</p>
+
+    <form action="/register" method="POST">
+      <div class="form-group">
+        <label for="fullName">ФИО</label>
+        <input type="text" id="fullName" name="fullName" required>
+      </div>
+
+      <div class="form-group">
+        <label for="login">Логин</label>
+        <input type="text" id="login" name="login" required>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Пароль</label>
+        <input type="password" id="password" name="password" required minlength="4">
+      </div>
+
+      <!-- КАПЧА -->
+      <div class="form-group captcha-box">
+        <label>Подтвердите, что вы не робот</label>
+        <div id="captcha-container-reg"></div>
+        <input type="hidden" name="captcha_token" id="captcha_token_reg">
+        <input type="text" name="captcha_answer" id="captcha_answer_reg" placeholder="Ответ" required style="margin-top:8px;width:100%">
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
+    </form>
+
+    <div class="auth-links">
+      Уже есть аккаунт? <a href="/login.html">Войти</a>
+    </div>
+  </div>
+
+  <script src="/js/captcha.js"></script>
+  <script src="/js/auth.js"></script>
+</body>
+</html>

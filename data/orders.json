@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "userLogin": "user",
+    "items": [
+      { "productId": 1, "name": "Мягкий мишка", "qty": 1, "price": 1299 }
+    ],
+    "total": 1299,
+    "status": "new",
+    "createdAt": "2026-02-01T10:00:00.000Z"
+  }
+]

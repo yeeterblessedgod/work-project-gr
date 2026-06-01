@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "login": "user",
+    "password": "user123",
+    "fullName": "Тестовый Пользователь",
+    "role": "user",
+    "email": "user@test.local"
+  },
+  {
+    "id": 2,
+    "login": "manager",
+    "password": "manager123",
+    "fullName": "Тестовый Менеджер",
+    "role": "manager",
+    "email": "manager@test.local"
+  },
+  {
+    "id": 3,
+    "login": "admin",
+    "password": "admin123",
+    "fullName": "Тестовый Администратор",
+    "role": "admin",
+    "email": "admin@test.local"
+  }
+]

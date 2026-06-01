@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <!-- ========================================================================
+       АДМИН-ПАНЕЛЬ — только роль admin
+       Вкладки по ТЗ:
+         1. Список пользователей
+         2. Управление товарами
+         3. Управление пользователями (+ заказы)
+       Логика: public/js/admin.js
+       ======================================================================== -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админ-панель — YourProjectName</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <h1>YourProjectName — админ-панель [GR]</h1>
+    <div style="display:flex;gap:8px">
+      <a href="/catalog.html" class="btn btn-secondary">← К каталогу</a>
+      <form action="/logout" method="POST" style="margin:0">
+        <button type="submit" class="btn btn-secondary">Выйти</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Вкладки админки -->
+    <nav class="admin-tabs" id="admin-tabs">
+      <button type="button" data-tab="users-list" class="active">Список пользователей</button>
+      <button type="button" data-tab="products">Управление товарами</button>
+      <button type="button" data-tab="users-manage">Управление пользователями</button>
+    </nav>
+
+    <!-- Вкладка 1: только просмотр списка -->
+    <section id="tab-users-list" class="admin-panel">
+      <h2>Список пользователей</h2>
+      <p class="subtitle">Все зарегистрированные пользователи системы YourProjectName</p>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Логин</th>
+            <th>ФИО</th>
+            <th>Email</th>
+            <th>Роль</th>
+          </tr>
+        </thead>
+        <tbody id="users-list-body"></tbody>
+      </table>
+    </section>
+
+    <!-- Вкладка 2: CRUD товаров + расширенная сортировка -->
+    <section id="tab-products" class="admin-panel hidden">
+      <h2>Управление товарами</h2>
+      <p class="subtitle">Расширенная сортировка: категория, остаток (доступна только админу)</p>
+      <div class="toolbar">
+        <select id="admin-sort-by">
+          <option value="name">По имени</option>
+          <option value="price">По цене</option>
+          <option value="publishedAt">По дате</option>
+          <option value="category">По категории</option>
+          <option value="stock">По остатку</option>
+        </select>
+        <select id="admin-sort-order">
+          <option value="asc">↑</option>
+          <option value="desc">↓</option>
+        </select>
+        <button type="button" class="btn btn-secondary btn-sm" id="admin-refresh-products">Обновить</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Цена</th>
+            <th>Категория</th>
+            <th>Остаток</th>
+            <th>Дата</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="admin-products-body"></tbody>
+      </table>
+      <h3 style="margin-top:24px">Добавить / изменить товар</h3>
+      <form id="admin-product-form">
+        <input type="hidden" id="admin-product-id">
+        <div class="form-group">
+          <label>Название</label>
+          <input type="text" id="admin-product-name" required>
+        </div>
+        <div class="form-group">
+          <label>Цена</label>
+          <input type="number" id="admin-product-price" required>
+        </div>
+        <div class="form-group">
+          <label>Категория</label>
+          <input type="text" id="admin-product-category">
+        </div>
+        <div class="form-group">
+          <label>Остаток</label>
+          <input type="number" id="admin-product-stock">
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+      </form>
+    </section>
+
+    <!-- Вкладка 3: смена ролей + управление заказами -->
+    <section id="tab-users-manage" class="admin-panel hidden">
+      <h2>Управление пользователями</h2>
+      <p class="subtitle">Изменение роли пользователя (user / manager / admin)</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Логин</th>
+            <th>ФИО</th>
+            <th>Текущая роль</th>
+            <th>Новая роль</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="users-manage-body"></tbody>
+      </table>
+
+      <h2 style="margin-top:32px">Управление заказами пользователей</h2>
+      <p class="subtitle">Смена статуса заказа: new → processing → done</p>
+      <table>
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Пользователь</th>
+            <th>Сумма</th>
+            <th>Статус</th>
+            <th>Дата</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="orders-body"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
