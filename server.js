@@ -20,7 +20,7 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
-const net = require('net');
+const http = require('http');
 
 const app = express();
 /** Порт по умолчанию; если занят — сервер сам возьмёт 3002, 3003… */
@@ -368,51 +368,35 @@ app.put('/api/admin/orders/:id', requireRole('admin'), (req, res) => {
 });
 
 // ============================================================================
-//  ЗАПУСК (автовыбор порта, если DEFAULT_PORT занят)
+//  ЗАПУСК — если порт занят, пробует следующий
 // ============================================================================
 
-function findFreePort(startPort, maxAttempts = 50) {
-  return new Promise((resolve, reject) => {
-    let port = startPort;
-    let attempt = 0;
+const server = http.createServer(app);
 
-    const probe = () => {
-      const tester = net.createServer();
-      tester.unref();
-      tester.on('error', (err) => {
-        tester.close();
-        if (err.code === 'EADDRINUSE' && attempt < maxAttempts) {
-          attempt += 1;
-          port += 1;
-          probe();
-        } else {
-          reject(err);
-        }
-      });
-      tester.listen(port, '127.0.0.1', () => {
-        tester.close(() => resolve(port));
-      });
-    };
+function tryListen(port, attemptsLeft) {
+  function onListening() {
+    server.removeListener('error', onError);
+    if (port !== DEFAULT_PORT) {
+      console.log(`Порт ${DEFAULT_PORT} занят — используем ${port}`);
+    }
+    console.log(`YourProjectName [GR]: http://localhost:${port}`);
+    console.log('Тест: user/user123, manager/manager123, admin/admin123');
+  }
 
-    probe();
-  });
+  function onError(err) {
+    server.removeListener('listening', onListening);
+    if (err.code === 'EADDRINUSE' && attemptsLeft > 0) {
+      console.log(`Порт ${port} занят — пробуем ${port + 1}…`);
+      tryListen(port + 1, attemptsLeft - 1);
+      return;
+    }
+    console.error('Не удалось запустить сервер:', err.message);
+    process.exit(1);
+  }
+
+  server.once('listening', onListening);
+  server.once('error', onError);
+  server.listen(port);
 }
 
-function startServer() {
-  findFreePort(DEFAULT_PORT)
-    .then((port) => {
-      if (port !== DEFAULT_PORT) {
-        console.log(`Порт ${DEFAULT_PORT} занят — используем ${port}`);
-      }
-      app.listen(port, () => {
-        console.log(`YourProjectName [GR]: http://localhost:${port}`);
-        console.log('Тест: user/user123, manager/manager123, admin/admin123');
-      });
-    })
-    .catch((err) => {
-      console.error('Не удалось запустить сервер:', err.message);
-      process.exit(1);
-    });
-}
-
-startServer();
+tryListen(DEFAULT_PORT, 50);
